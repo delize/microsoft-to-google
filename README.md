@@ -102,6 +102,15 @@ python ics_to_google_calendar.py "calendar.ics" \
     --calendar "your-calendar-id@group.calendar.google.com"
 ```
 
+### Add yourself as attendee
+
+If you get "not organizer/attendee" errors, add yourself to all events:
+
+```bash
+python ics_to_google_calendar.py "calendar.ics" \
+    --add-self your.email@gmail.com
+```
+
 ### Combine options
 
 ```bash
@@ -109,7 +118,8 @@ python ics_to_google_calendar.py "calendar.ics" \
     --dry-run \
     --start-date 2024-01-01 \
     --end-date 2025-01-01 \
-    --limit 20
+    --limit 20 \
+    --add-self your.email@gmail.com
 ```
 
 ## Command Line Options
@@ -120,10 +130,14 @@ python ics_to_google_calendar.py "calendar.ics" \
 |--------|-------------|
 | `--dry-run` | Preview import without creating events |
 | `--calendar ID` | Target calendar ID (default: primary) |
+| `--credentials FILE` | Path to Google OAuth credentials file (default: credentials.json) |
 | `--no-attendees` | Skip importing attendee information |
+| `--no-skip-duplicates` | Import all events even if they already exist |
 | `--start-date YYYY-MM-DD` | Only import events on or after this date |
 | `--end-date YYYY-MM-DD` | Only import events before this date |
 | `--limit N` | Import only the first N events |
+| `--add-self EMAIL` | Add this email as attendee to all events (prevents "not organizer/attendee" errors) |
+| `--list-calendars` | List available Google Calendars and exit |
 
 ### ics_analyzer.py
 
