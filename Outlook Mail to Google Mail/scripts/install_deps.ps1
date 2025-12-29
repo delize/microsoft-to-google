@@ -24,13 +24,27 @@ if (-not $python) {
 Write-Host "Python found: $($python.Source)" -ForegroundColor Green
 Write-Host ""
 
-# Install GYB
-Write-Host "Installing GYB (Got Your Back)..."
-try {
-    & pip install got-your-back
-    Write-Host "GYB installed successfully" -ForegroundColor Green
-} catch {
-    Write-Host "Error installing GYB: $_" -ForegroundColor Red
+# Install Python dependencies from requirements.txt
+Write-Host "Installing Python dependencies from requirements.txt..."
+$ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+$RequirementsFile = Join-Path (Split-Path -Parent $ScriptDir) "requirements.txt"
+
+if (Test-Path $RequirementsFile) {
+    try {
+        & pip install -r $RequirementsFile
+        Write-Host "Python dependencies installed successfully" -ForegroundColor Green
+    } catch {
+        Write-Host "Error installing dependencies: $_" -ForegroundColor Red
+    }
+} else {
+    Write-Host "Warning: requirements.txt not found at $RequirementsFile" -ForegroundColor Yellow
+    Write-Host "Installing GYB directly..."
+    try {
+        & pip install got-your-back
+        Write-Host "GYB installed successfully" -ForegroundColor Green
+    } catch {
+        Write-Host "Error installing GYB: $_" -ForegroundColor Red
+    }
 }
 
 Write-Host ""

@@ -34,8 +34,16 @@ echo "Installing Python and pip..."
 sudo apt install -y python3 python3-pip
 
 echo
-echo "Installing GYB (Got Your Back)..."
-pip3 install --user got-your-back
+echo "Installing Python dependencies from requirements.txt..."
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REQUIREMENTS_FILE="$SCRIPT_DIR/../requirements.txt"
+
+if [[ -f "$REQUIREMENTS_FILE" ]]; then
+    pip3 install --user -r "$REQUIREMENTS_FILE"
+else
+    echo "Warning: requirements.txt not found, installing GYB directly..."
+    pip3 install --user got-your-back
+fi
 
 # Add local bin to PATH if not already there
 if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
