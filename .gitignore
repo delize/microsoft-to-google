@@ -1,6 +1,8 @@
 # Google API credentials - NEVER commit these
 credentials.json
 token.json
+token.pickle
+*.pickle
 
 # Python
 __pycache__/
