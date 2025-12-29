@@ -49,11 +49,17 @@ sudo yum install libpst
 sudo pacman -S libpst
 ```
 
-### Windows (via WSL2)
+### Windows
 
-Windows doesn't have a native `readpst`. The recommended approach is to use WSL2 (Windows Subsystem for Linux).
+Windows has several options for running readpst, listed from recommended to fallback:
 
-#### Step 1: Install WSL2
+---
+
+#### Option 1: WSL2 (Recommended)
+
+WSL2 (Windows Subsystem for Linux) provides the best experience with full Linux compatibility.
+
+**Step 1: Install WSL2**
 
 1. Open PowerShell as Administrator
 2. Run:
@@ -64,7 +70,7 @@ Windows doesn't have a native `readpst`. The recommended approach is to use WSL2
 4. After restart, Ubuntu will install automatically
 5. Create a username and password when prompted
 
-#### Step 2: Install readpst in WSL2
+**Step 2: Install readpst in WSL2**
 
 Open the Ubuntu terminal (search for "Ubuntu" in Start menu):
 
@@ -79,7 +85,7 @@ Verify installation:
 readpst --version
 ```
 
-#### Step 3: Access Windows Files from WSL2
+**Step 3: Access Windows Files from WSL2**
 
 Your Windows drives are mounted under `/mnt/`:
 
@@ -91,7 +97,7 @@ cd /mnt/c/Users/YourUsername/Documents
 ls *.pst
 ```
 
-#### Example: Convert a PST File in WSL2
+**Example: Convert a PST File in WSL2**
 
 ```bash
 # Navigate to your PST file location
@@ -101,9 +107,81 @@ cd /mnt/c/Users/YourUsername/Documents
 readpst -S -e -o ./converted_mail "Outlook Backup.pst"
 ```
 
-### Windows (Alternative: Manual Conversion)
+---
 
-If you can't use WSL2, you can manually convert PST files using Mozilla Thunderbird:
+#### Option 2: Cygwin
+
+Cygwin provides a Unix-like environment on Windows with readpst available as a package.
+
+**Step 1: Install Cygwin**
+
+1. Download the Cygwin installer from [cygwin.com](https://www.cygwin.com/install.html)
+2. Run `setup-x86_64.exe`
+3. Choose "Install from Internet"
+4. Select a mirror and proceed
+
+**Step 2: Install readpst Package**
+
+During Cygwin setup (or run setup again to add packages):
+
+1. In the package selection screen, search for `readpst`
+2. Click the "Skip" text next to `readpst` to select it for installation
+3. Complete the installation
+
+Alternatively, if you have Cygwin's `apt-cyg` package manager:
+```bash
+apt-cyg install readpst
+```
+
+**Step 3: Use readpst**
+
+Open Cygwin Terminal and run:
+
+```bash
+readpst --version
+
+# Convert PST (use /cygdrive/c for C: drive)
+cd /cygdrive/c/Users/YourUsername/Documents
+readpst -S -e -o ./converted_mail "Outlook Backup.pst"
+```
+
+---
+
+#### Option 3: Native Windows Binary (ezwinports)
+
+Pre-compiled Windows binaries are available from ezwinports (older version 0.6.63, but functional).
+
+**Step 1: Download**
+
+Download from: [libpst-0.6.63-w32-bin.zip](https://sourceforge.net/projects/ezwinports/files/libpst-0.6.63-w32-bin.zip/)
+
+**Step 2: Extract**
+
+1. Extract the ZIP file to a folder (e.g., `C:\Tools\libpst`)
+2. The `bin` folder contains `readpst.exe`
+
+**Step 3: Add to PATH (Optional)**
+
+Add `C:\Tools\libpst\bin` to your system PATH, or use the full path:
+
+```powershell
+C:\Tools\libpst\bin\readpst.exe --version
+```
+
+**Step 4: Use readpst**
+
+```powershell
+cd C:\Users\YourUsername\Documents
+C:\Tools\libpst\bin\readpst.exe -S -e -o .\converted_mail "Outlook Backup.pst"
+```
+
+**Note:** This is an older version (0.6.63 vs current 0.6.76) but handles most PST files correctly.
+
+---
+
+#### Option 4: Manual Conversion (Thunderbird)
+
+If none of the above options work, you can manually convert PST files using Mozilla Thunderbird:
 
 1. **Install Thunderbird** from [thunderbird.net](https://www.thunderbird.net/)
 2. **Import PST:**
