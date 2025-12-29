@@ -1,0 +1,17 @@
+# PST to Gmail Migration Tool - Python Dependencies
+#
+# Core dependencies (Python stdlib):
+#   - email (parsing EML files)
+#   - mailbox (parsing MBOX files)
+#   - subprocess (running readpst and GYB)
+#   - argparse, pathlib, etc.
+#
+# External tools required (not Python packages):
+#   - readpst (libpst) - Install via brew/apt
+#   - GYB (Got Your Back) - pip install got-your-back
+#
+# This file lists Python package dependencies for the migration scripts.
+# The scripts primarily use stdlib, so minimal dependencies are needed.
+
+# GYB (Got Your Back) - Gmail backup/restore tool
+got-your-back>=1.0.0

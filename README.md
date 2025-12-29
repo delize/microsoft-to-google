@@ -7,6 +7,7 @@ A collection of tools for migrating data from Microsoft/Outlook services to Goog
 | Tool | Description |
 |------|-------------|
 | [Outlook Cal to Google Cal](./Outlook%20Cal%20to%20Google%20Cal/) | Migrate calendar events from Outlook/Exchange ICS exports to Google Calendar without sending invitations to attendees |
+| [Outlook Mail to Google Mail](./Outlook%20Mail%20to%20Google%20Mail/) | Migrate email from Outlook PST files, EML, or MBOX archives to Gmail using readpst and GYB |
 
 ## Why These Tools?
 
