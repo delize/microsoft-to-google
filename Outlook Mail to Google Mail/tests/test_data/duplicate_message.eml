@@ -1,0 +1,9 @@
+From: sender@example.com
+To: recipient@example.com
+Subject: Test Email - Duplicate of Simple Message
+Date: Mon, 15 Jan 2024 10:30:00 -0500
+Message-ID: <test001@example.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+
+This email has the same Message-ID as valid_simple.eml and should be flagged as a duplicate.

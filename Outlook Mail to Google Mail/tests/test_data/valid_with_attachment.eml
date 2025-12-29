@@ -1,0 +1,21 @@
+From: sender@example.com
+To: recipient@example.com
+Subject: Test Email with Attachment
+Date: Tue, 16 Jan 2024 14:00:00 -0500
+Message-ID: <test002@example.com>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="----=_Part_0_123456789"
+
+------=_Part_0_123456789
+Content-Type: text/plain; charset="utf-8"
+
+This email has an attachment.
+
+------=_Part_0_123456789
+Content-Type: text/plain; name="test.txt"
+Content-Disposition: attachment; filename="test.txt"
+Content-Transfer-Encoding: base64
+
+VGhpcyBpcyBhIHRlc3QgYXR0YWNobWVudCBmaWxlLg==
+
+------=_Part_0_123456789--

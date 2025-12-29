@@ -15,3 +15,7 @@
 
 # GYB (Got Your Back) - Gmail backup/restore tool
 got-your-back>=1.0.0
+
+# Development/Testing dependencies
+# Install with: pip install -r requirements.txt
+pytest>=7.0.0

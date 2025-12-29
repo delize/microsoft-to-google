@@ -1,0 +1,10 @@
+From: sender@example.com
+To: user1@example.com, user2@example.com, user3@example.com, user4@example.com, user5@example.com
+Cc: cc1@example.com, cc2@example.com, cc3@example.com, cc4@example.com, cc5@example.com
+Subject: Test Email with Multiple Recipients
+Date: Thu, 18 Jan 2024 11:00:00 -0500
+Message-ID: <test005@example.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+
+This email has multiple recipients in To and Cc fields.

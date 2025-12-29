@@ -1,0 +1,8 @@
+From: sender@example.com
+To: recipient@example.com
+Subject: Malformed Email - Missing Date Header
+Message-ID: <test004@example.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+
+This email is missing the Date header and should trigger a validation warning.

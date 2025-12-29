@@ -1,0 +1,153 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint-and-syntax:
+    name: Lint & Syntax Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install flake8 pyflakes
+
+      - name: Syntax check - Calendar tools
+        run: |
+          python -m py_compile "Outlook Cal to Google Cal/ics_to_google_calendar.py"
+          python -m py_compile "Outlook Cal to Google Cal/ics_analyzer.py"
+          python -m py_compile "Outlook Cal to Google Cal/ics_validator.py"
+
+      - name: Syntax check - Mail tools
+        run: |
+          python -m py_compile "Outlook Mail to Google Mail/pst_to_gmail.py"
+          python -m py_compile "Outlook Mail to Google Mail/pst_analyzer.py"
+          python -m py_compile "Outlook Mail to Google Mail/eml_validator.py"
+
+      - name: Lint - Critical errors only
+        run: |
+          # Check for critical errors (undefined names, syntax errors)
+          flake8 "Outlook Cal to Google Cal/" --select=E9,F63,F7,F82 --show-source --statistics || true
+          flake8 "Outlook Mail to Google Mail/" --select=E9,F63,F7,F82 --show-source --statistics || true
+
+  test-mail-tools:
+    name: Test Mail Migration Tools
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y pst-utils
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest
+          # Install mail tool dependencies (if any beyond stdlib)
+          if [ -f "Outlook Mail to Google Mail/requirements.txt" ]; then
+            pip install -r "Outlook Mail to Google Mail/requirements.txt" || true
+          fi
+
+      - name: Verify readpst installation
+        run: |
+          readpst --version || echo "readpst version check"
+
+      - name: Download sample PST for testing
+        run: |
+          curl -L -o "Outlook Mail to Google Mail/tests/test_data/sample.pst" \
+            "https://github.com/aspose-email/Aspose.Email-for-Java/raw/refs/heads/master/Examples/src/main/resources/outlook/sample.pst"
+
+      - name: Run tests
+        run: |
+          cd "Outlook Mail to Google Mail"
+          pytest tests/ -v --tb=short
+
+  test-calendar-tools:
+    name: Test Calendar Migration Tools
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest
+          pip install -r "Outlook Cal to Google Cal/requirements.txt"
+
+      - name: Import check - Calendar tools
+        run: |
+          cd "Outlook Cal to Google Cal"
+          python -c "import ics_analyzer; print('ics_analyzer OK')"
+          python -c "import ics_validator; print('ics_validator OK')"
+          # Main importer needs google API libs which require credentials
+          python -c "from ics_to_google_calendar import normalize_timezone, filter_events_by_date; print('ics_to_google_calendar imports OK')"
+
+  test-cross-platform:
+    name: Cross-Platform Test
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        python-version: ["3.9", "3.11", "3.12"]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install system dependencies (Ubuntu)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y pst-utils
+
+      - name: Install system dependencies (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          brew install libpst || true
+
+      - name: Install Python test dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest
+
+      - name: Download sample PST for testing
+        run: |
+          mkdir -p "Outlook Mail to Google Mail/tests/test_data"
+          curl -L -o "Outlook Mail to Google Mail/tests/test_data/sample.pst" \
+            "https://github.com/aspose-email/Aspose.Email-for-Java/raw/refs/heads/master/Examples/src/main/resources/outlook/sample.pst"
+
+      - name: Run mail tool tests
+        run: |
+          cd "Outlook Mail to Google Mail"
+          pytest tests/ -v --tb=short -x
