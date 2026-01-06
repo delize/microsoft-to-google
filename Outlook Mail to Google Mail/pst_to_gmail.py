@@ -145,6 +145,32 @@ def count_eml_files(directory: Path) -> int:
     return len(list(directory.rglob('*.eml')))
 
 
+def count_mbox_files(directory: Path) -> int:
+    """Count MBOX files in a directory recursively"""
+    return len(list(directory.rglob('*.mbox')))
+
+
+def count_messages_in_mbox(mbox_path: Path) -> int:
+    """Count messages in an MBOX file by counting 'From ' lines"""
+    count = 0
+    try:
+        with open(mbox_path, 'rb') as f:
+            for line in f:
+                if line.startswith(b'From '):
+                    count += 1
+    except Exception:
+        pass
+    return count
+
+
+def count_all_mbox_messages(directory: Path) -> int:
+    """Count total messages across all MBOX files in a directory"""
+    total = 0
+    for mbox_file in directory.rglob('*.mbox'):
+        total += count_messages_in_mbox(mbox_file)
+    return total
+
+
 def convert_pst_to_eml(pst_path: str, output_dir: str, readpst_path: str,
                         dry_run: bool = False) -> Tuple[bool, int]:
     """
@@ -174,11 +200,9 @@ def convert_pst_to_eml(pst_path: str, output_dir: str, readpst_path: str,
     output_dir.mkdir(parents=True, exist_ok=True)
 
     # Build readpst command
-    # -S: Separate files (EML format)
-    # -e: Include attachments
-    # -r: Recursive folder structure
+    # Default output is MBOX format, which GYB's restore-mbox can import
     # -o: Output directory
-    cmd = [readpst_path, '-S', '-e', '-r', '-o', str(output_dir), str(pst_path)]
+    cmd = [readpst_path, '-o', str(output_dir), str(pst_path)]
 
     print(f"\nRunning: {' '.join(cmd)}")
     print("-" * 60)
@@ -212,12 +236,12 @@ def convert_pst_to_eml(pst_path: str, output_dir: str, readpst_path: str,
 
     elapsed = time.time() - start_time
 
-    # Count converted files
-    message_count = count_eml_files(output_dir)
+    # Count converted files (MBOX format)
+    message_count = count_mbox_files(output_dir)
 
     print("-" * 60)
     print(f"Conversion complete in {elapsed:.1f}s")
-    print(f"Messages converted: {message_count}")
+    print(f"MBOX files created: {message_count}")
 
     return True, message_count
 
@@ -343,7 +367,8 @@ def check_gyb_auth(email: str, gyb_path: str) -> bool:
             return True
         else:
             print(f"  GYB authentication check failed")
-            print(f"  Run: gyb --email {email} --action check")
+            print(f"  First create a project: gyb --action create-project --email {email}")
+            print(f"  Then authenticate: gyb --email {email} --action count")
             return False
 
     except subprocess.TimeoutExpired:
@@ -455,7 +480,7 @@ Examples:
     if not args.dry_run:
         if not check_gyb_auth(args.email, gyb_path):
             print("\nPlease authenticate GYB first:")
-            print(f"  gyb --email {args.email} --action check")
+            print(f"  gyb --email {args.email} --action count")
             sys.exit(1)
 
     # Determine what to upload
@@ -466,15 +491,20 @@ Examples:
     if input_format == 'pst':
         needs_conversion = True
         upload_path = args.output_dir
+        gyb_action = 'restore-mbox'  # PST converts to MBOX format
         stats.pst_size = Path(args.input_path).stat().st_size
 
         # Check if we should skip conversion (resume mode)
         if args.resume and Path(args.output_dir).exists():
-            eml_count = count_eml_files(Path(args.output_dir))
-            if eml_count > 0:
-                print(f"\nResume mode: Found {eml_count} existing EML files, skipping conversion")
+            mbox_count = count_mbox_files(Path(args.output_dir))
+            if mbox_count > 0:
+                print(f"\nResume mode: Found {mbox_count} existing MBOX files, skipping conversion")
                 needs_conversion = False
-                stats.messages_found = eml_count
+                stats.messages_found = mbox_count
+        elif Path(args.output_dir).exists() and not args.resume:
+            # Clean up old files when not resuming
+            print(f"\nCleaning up previous conversion in {args.output_dir}...")
+            shutil.rmtree(args.output_dir)
 
         if needs_conversion:
             success, count = convert_pst_to_eml(

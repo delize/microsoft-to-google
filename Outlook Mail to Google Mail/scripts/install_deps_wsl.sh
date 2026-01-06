@@ -86,7 +86,7 @@ echo "  python3 pst_to_gmail.py 'Outlook Backup.pst' --email your@gmail.com"
 echo
 echo "Next steps:"
 echo "  1. Set up GYB authentication:"
-echo "     gyb --email your.email@gmail.com --action check"
+echo "     gyb --email your.email@gmail.com --action count"
 echo
 echo "  2. Navigate to your PST file location:"
 echo "     cd /mnt/c/Users/YourName/Documents"

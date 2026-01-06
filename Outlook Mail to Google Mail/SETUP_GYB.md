@@ -4,142 +4,60 @@ GYB is a command-line tool for backing up and restoring Gmail. We use it to uplo
 
 ## Step 1: Install GYB
 
-### macOS / Linux
+Run the install script which downloads the latest GYB standalone build:
 
 ```bash
-pip install got-your-back
+zsh scripts/install_deps.sh
 ```
 
-Or install from source:
-```bash
-git clone https://github.com/GAM-team/got-your-back.git
-cd got-your-back
-pip install -r requirements.txt
-```
-
-### Windows
-
-```powershell
-pip install got-your-back
-```
-
-Or download the standalone executable from [GYB Releases](https://github.com/GAM-team/got-your-back/releases).
+Or download manually from [GYB Releases](https://github.com/GAM-team/got-your-back/releases).
 
 ### Verify Installation
 
 ```bash
+# If installed via script:
+./gyb/gyb --version
+
+# Or if in PATH:
 gyb --version
 ```
 
 You should see output like: `Got Your Back 1.x.x`
 
-## Step 2: Create Google Cloud Project
+## Step 2: Create Google Cloud Project (Automated)
 
-GYB requires OAuth credentials to access Gmail. You'll need to create a Google Cloud project.
-
-### 2.1 Go to Google Cloud Console
-
-1. Open [Google Cloud Console](https://console.cloud.google.com/)
-2. Sign in with your Google account
-
-### 2.2 Create a New Project
-
-1. Click the project dropdown at the top of the page
-2. Click **"New Project"**
-3. Enter a project name (e.g., "Gmail Migration")
-4. Click **"Create"**
-5. Wait for the project to be created, then select it
-
-### 2.3 Enable the Gmail API
-
-1. Go to **APIs & Services** > **Library**
-2. Search for **"Gmail API"**
-3. Click on **Gmail API**
-4. Click **"Enable"**
-
-## Step 3: Configure OAuth Consent Screen
-
-Before creating credentials, you must configure the OAuth consent screen.
-
-### 3.1 Go to OAuth Consent Screen
-
-1. Go to **APIs & Services** > **OAuth consent screen**
-2. Select **"External"** user type (unless you have Workspace)
-3. Click **"Create"**
-
-### 3.2 Fill in App Information
-
-1. **App name:** "Gmail Migration Tool" (or any name)
-2. **User support email:** Your email address
-3. **Developer contact:** Your email address
-4. Click **"Save and Continue"**
-
-### 3.3 Add Scopes
-
-1. Click **"Add or Remove Scopes"**
-2. Search for and select:
-   - `https://mail.google.com/` (Full Gmail access)
-3. Click **"Update"**
-4. Click **"Save and Continue"**
-
-### 3.4 Add Test Users
-
-Since the app is in testing mode, you need to add yourself as a test user:
-
-1. Click **"Add Users"**
-2. Enter your Gmail address
-3. Click **"Add"**
-4. Click **"Save and Continue"**
-
-### 3.5 Review and Complete
-
-1. Review your settings
-2. Click **"Back to Dashboard"**
-
-## Step 4: Create OAuth Credentials
-
-### 4.1 Go to Credentials
-
-1. Go to **APIs & Services** > **Credentials**
-2. Click **"Create Credentials"**
-3. Select **"OAuth client ID"**
-
-### 4.2 Configure the Client
-
-1. **Application type:** Desktop app
-2. **Name:** "GYB Migration" (or any name)
-3. Click **"Create"**
-
-### 4.3 Download Credentials
-
-1. A dialog will show your Client ID and Client Secret
-2. Click **"Download JSON"**
-3. Save the file as `client_secrets.json`
-
-## Step 5: Configure GYB with Credentials
-
-### 5.1 Place Credentials File
-
-Copy the downloaded `client_secrets.json` to GYB's config directory:
-
-**macOS/Linux:**
-```bash
-mkdir -p ~/.gyb
-cp client_secrets.json ~/.gyb/
-```
-
-**Windows:**
-```powershell
-mkdir $env:USERPROFILE\.gyb -Force
-copy client_secrets.json $env:USERPROFILE\.gyb\
-```
-
-### 5.2 Authenticate GYB
-
-Run the authentication command:
+GYB can automatically create a Google Cloud project for you. This is the easiest method.
 
 ```bash
-gyb --email your.email@gmail.com --action check
+./gyb/gyb --action create-project --email your.email@gmail.com
+```
+
+This will:
+
+1. **Open a browser** - Sign in with your Google account and authorize GYB to create a project
+2. **Create the project** - GYB creates "Got Your Back Project" and enables required APIs
+3. **Prompt you to create OAuth credentials** - You'll see a URL like:
+   ```
+   Please go to:
+   https://console.cloud.google.com/apis/credentials/oauthclient?project=gyb-project-xxx-xxx-xxx
+   ```
+
+4. **In the browser**, follow these steps:
+   - Enter **"GYB"** for "Application name"
+   - Leave other fields blank, click **"Save"**
+   - Choose **"Desktop app"**
+   - Enter any name (e.g., "GYB"), click **"Create"**
+   - Copy the **Client ID** and paste it into the terminal
+   - Copy the **Client Secret** and paste it into the terminal
+
+5. **Done!** You'll see: `That's it! Your GYB Project is created and ready to use.`
+
+## Step 3: Authenticate with Gmail
+
+Now authorize GYB to access your Gmail account:
+
+```bash
+./gyb/gyb --email your.email@gmail.com --action count
 ```
 
 This will:
@@ -147,14 +65,11 @@ This will:
 2. Ask you to sign in to Google
 3. Request permission to access Gmail
 4. Save the authentication token for future use
+5. Display a count of messages in your Gmail (confirming it works)
 
-### 5.3 Verify Authentication
+## Alternative: Manual Project Setup
 
-```bash
-gyb --email your.email@gmail.com --action count
-```
-
-This should display a count of messages in your Gmail account, confirming authentication works.
+If the automated setup doesn't work, you can create the project manually.
 
 ## Troubleshooting
 
@@ -223,7 +138,7 @@ To revoke GYB's access to your Gmail:
 
 | Command | Purpose |
 |---------|---------|
-| `gyb --email EMAIL --action check` | Verify authentication |
+| `gyb --email EMAIL --action count` | Verify authentication (shows message count) |
 | `gyb --email EMAIL --action count` | Count messages |
 | `gyb --email EMAIL --action restore --local-folder DIR` | Restore EML files |
 | `gyb --email EMAIL --action restore-mbox --local-folder DIR` | Restore MBOX files |

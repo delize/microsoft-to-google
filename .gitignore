@@ -32,6 +32,12 @@ ENV/
 env/
 .venv/
 
+# GYB standalone build (downloaded by install script)
+**/gyb/**
+
+# Converted mail output directory
+**/converted_mail/**
+
 # IDE
 .idea/
 .vscode/
@@ -45,6 +51,10 @@ Thumbs.db
 
 # Test ICS files (may contain personal data)
 *.ics
+
+# PST files (may contain personal data)
+*.pst
+*.PST
 
 # Logs
 *.log

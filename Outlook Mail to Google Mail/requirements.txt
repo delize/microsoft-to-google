@@ -18,7 +18,9 @@
 
 # GYB (Got Your Back) - Gmail backup/restore tool
 # https://github.com/GAM-team/got-your-back
-got-your-back>=1.0.0
+# NOTE: GYB cannot be pip installed - it's distributed as standalone builds
+# Run: scripts/install_deps.sh to download automatically
+# Or download from: https://github.com/GAM-team/got-your-back/releases
 
 # Testing dependencies
 pytest>=7.0.0

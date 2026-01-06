@@ -53,7 +53,7 @@ Follow the detailed guide: **[SETUP_GYB.md](SETUP_GYB.md)**
 Quick version:
 ```bash
 # Authenticate GYB with your Gmail account
-gyb --email your.email@gmail.com --action check
+gyb --email your.email@gmail.com --action count
 ```
 
 ### 3. Analyze Your PST (Optional)
@@ -252,7 +252,7 @@ Install libpst:
 
 Run GYB authentication:
 ```bash
-gyb --email your.email@gmail.com --action check
+gyb --email your.email@gmail.com --action count
 ```
 
 ### "Rate limit exceeded"
